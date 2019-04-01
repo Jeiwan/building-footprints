@@ -30,6 +30,14 @@ func main() {
 			Name:  "port",
 			Value: 3000,
 		},
+		cli.StringFlag{
+			Name:  "mongo-url",
+			Value: "127.0.0.1:27017",
+		},
+		cli.StringFlag{
+			Name:  "mongo-db-name",
+			Value: "building-footprints",
+		},
 	}
 	app.Action = func(c *cli.Context) error {
 
@@ -45,6 +53,27 @@ func main() {
 		api.GET("/avg_area", handlers.AvgArea)
 
 		return e.Start(fmt.Sprintf(":%d", c.Int("port")))
+	}
+
+	app.Commands = []cli.Command{
+		cli.Command{
+			Name: "load-data",
+			Flags: []cli.Flag{
+				cli.StringFlag{
+					Name:  "mongo-url",
+					Value: "127.0.0.1:27017",
+				},
+				cli.StringFlag{
+					Name:  "mongo-db-name",
+					Value: "building-footprints",
+				},
+				cli.StringFlag{
+					Name:  "data-file",
+					Value: "rows.json",
+				},
+			},
+			Action: cliLoadData,
+		},
 	}
 
 	if err := app.Run(os.Args); err != nil {
