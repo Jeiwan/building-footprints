@@ -44,14 +44,27 @@ func NewMongo(URL, dbName string) (DB, error) {
 }
 
 func (m Mongo) createIndexes() error {
-	_, err := m.c.Database(m.db).Collection(footprintsColl).Indexes().CreateOne(
+	if _, err := m.c.Database(m.db).Collection(footprintsColl).Indexes().CreateOne(
 		context.Background(),
 		mongo.IndexModel{
 			Keys:    bson.D{{"id", 1}},
 			Options: options.Index().SetUnique(true),
 		},
-	)
-	return err
+	); err != nil {
+		return err
+	}
+
+	if _, err := m.c.Database(m.db).Collection(footprintsColl).Indexes().CreateOne(
+		context.Background(),
+		mongo.IndexModel{
+			Keys:    bson.D{{"borough_code", 1}},
+			Options: options.Index(),
+		},
+	); err != nil {
+		return err
+	}
+
+	return nil
 }
 
 // SaveData saves data to Mongo
