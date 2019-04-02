@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/Jeiwan/building-footprints/db"
+
 	"github.com/Jeiwan/building-footprints/handlers"
 	"github.com/go-playground/validator"
 
@@ -41,11 +43,17 @@ func main() {
 	}
 	app.Action = func(c *cli.Context) error {
 
+		mongo, err := db.NewMongo(c.String("mongo-url"), c.String("mongo-db-name"))
+		if err != nil {
+			return err
+		}
+
 		e := echo.New()
 		e.Use(
 			middleware.Logger(),
 			middleware.Recover(),
 			middleware.Gzip(),
+			db.WithDB(mongo),
 		)
 		e.Validator = &customValidator{validator: validator.New()}
 

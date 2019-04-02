@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"math"
 
+	"github.com/pkg/errors"
 	"go.mongodb.org/mongo-driver/bson"
 
 	"go.mongodb.org/mongo-driver/mongo"
@@ -65,6 +66,40 @@ func (m Mongo) createIndexes() error {
 	}
 
 	return nil
+}
+
+// AvgHeightByBoroughCode returns average height by borough code
+func (m Mongo) AvgHeightByBoroughCode(boroughCode int) (float64, error) {
+	ctx := context.Background()
+	pipe := mongo.Pipeline{
+		{{"$match", bson.M{"borough_code": boroughCode}}},
+		{{"$group", bson.M{
+			"_id":        "$borough_code",
+			"avg_height": bson.M{"$avg": "$heightroof"},
+		}}},
+	}
+
+	cur, err := m.c.Database(m.db).Collection(footprintsColl).Aggregate(
+		ctx,
+		pipe,
+	)
+	if err != nil {
+		return -1.0, err
+	}
+
+	var result struct {
+		ID        int     `bson:"_id"`
+		AvgHeight float64 `bson:"avg_height"`
+	}
+	if !cur.Next(ctx) {
+		return -1.0, errors.Errorf("failed to calculate avg height: no results")
+	}
+
+	if err := cur.Decode(&result); err != nil {
+		return -1.0, err
+	}
+
+	return result.AvgHeight, nil
 }
 
 // SaveData saves data to Mongo
