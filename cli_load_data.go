@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
+	"strconv"
 
 	"github.com/Jeiwan/building-footprints/db"
 	"github.com/sirupsen/logrus"
@@ -77,11 +78,15 @@ func cliLoadData(c *cli.Context) error {
 	for i, building := range data.Data {
 		bin, ok := building[binColumnIdx].(string)
 		if !ok || len(bin) != 7 {
-			logrus.Errorf("wrong BIG value: %v", building[binColumnIdx])
+			logrus.Errorf("wrong BIN value: %v", building[binColumnIdx])
 			continue
 		}
 
-		boroughCode := string(bin[0])
+		boroughCode, err := strconv.Atoi(string(bin[0]))
+		if err != nil {
+			logrus.Errorf("wrong borough code: %v", building[binColumnIdx])
+			continue
+		}
 
 		trimmedData := []interface{}{
 			building[idColumnIdx],
