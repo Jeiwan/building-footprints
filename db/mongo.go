@@ -13,7 +13,7 @@ import (
 )
 
 const footprintsColl = "footprints"
-const batchSize = 1000
+const batchSize = 10000
 
 // Mongo implements MongoDB
 type Mongo struct {
@@ -107,6 +107,7 @@ func (m Mongo) SaveData(rows [][]interface{}) error {
 	ctx := context.Background()
 
 	var wm []mongo.WriteModel
+	var um *mongo.UpdateOneModel
 	var row []interface{}
 
 	batches := int(math.Ceil(float64(len(rows)) / float64(batchSize)))
@@ -121,7 +122,7 @@ Loop:
 			}
 			row = rows[rowIdx]
 
-			m := mongo.NewUpdateOneModel().
+			um = mongo.NewUpdateOneModel().
 				SetFilter(bson.M{"id": row[0]}).
 				SetUpdate(bson.M{"$set": bson.M{
 					"id":           row[0],
@@ -130,7 +131,8 @@ Loop:
 				}}).
 				SetUpsert(true)
 
-			wm = append(wm, m)
+			wm = append(wm, um)
+			um = nil
 		}
 
 		_, err := coll.BulkWrite(ctx, wm)

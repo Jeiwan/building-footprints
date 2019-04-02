@@ -37,6 +37,7 @@ func cliLoadData(c *cli.Context) error {
 		return err
 	}
 
+	logrus.Info("loading data into memory")
 	var data dataFileStructure
 	if err := json.NewDecoder(dataFile).Decode(&data); err != nil {
 		return err
@@ -108,6 +109,7 @@ func cliLoadData(c *cli.Context) error {
 		data.Data[i] = trimmedData
 	}
 
+	logrus.Info("saving data to Mongo")
 	db, err := db.NewMongo(c.String("mongo-url"), c.String("mongo-db-name"))
 	if err != nil {
 		return err
