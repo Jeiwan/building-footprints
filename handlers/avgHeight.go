@@ -8,7 +8,7 @@ import (
 )
 
 type request struct {
-	BoroughCode int `query:"borough_code" validate:"required"`
+	BoroughCode int `query:"borough_code" validate:"gt=0,lte=5"`
 }
 
 type response struct {
@@ -23,7 +23,7 @@ func AvgHeight(c echo.Context) error {
 	}
 
 	if err := c.Validate(req); err != nil {
-		return c.JSON(http.StatusBadRequest, map[string]string{"error": "borough_code is not specified"})
+		return c.JSON(http.StatusBadRequest, map[string]string{"error": "borough_code is not valid"})
 	}
 
 	db := c.Get("db").(db.DB)
