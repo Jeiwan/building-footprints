@@ -46,8 +46,6 @@ func cliLoadData(c *cli.Context) error {
 	idColumnIdx := -1
 	skippedColumns := 0
 	for _, c := range data.Metadata.View.Columns {
-		logrus.Printf("%+v\n", c)
-
 		if len(c.Flags) != 0 && c.Flags[0] == "hidden" {
 			skippedColumns++
 		}
@@ -77,9 +75,17 @@ func cliLoadData(c *cli.Context) error {
 	}
 
 	for i, building := range data.Data {
+		bin, ok := building[binColumnIdx].(string)
+		if !ok || len(bin) != 7 {
+			logrus.Errorf("wrong BIG value: %v", building[binColumnIdx])
+			continue
+		}
+
+		boroughCode := string(bin[0])
+
 		trimmedData := []interface{}{
 			building[idColumnIdx],
-			building[binColumnIdx],
+			boroughCode,
 			building[heightColumnIdx],
 		}
 		data.Data[i] = trimmedData

@@ -64,20 +64,21 @@ func (m Mongo) SaveData(rows [][]interface{}) error {
 	batches := int(math.Ceil(float64(len(rows)) / float64(batchSize)))
 	coll := m.c.Database(m.db).Collection(footprintsColl)
 
+Loop:
 	for i := 0; i < batches; i++ {
 		for j := 0; j < batchSize; j++ {
 			rowIdx := (i * batchSize) + j
 			if rowIdx >= len(rows) {
-				break
+				break Loop
 			}
 			row = rows[rowIdx]
 
 			m := mongo.NewUpdateOneModel().
 				SetFilter(bson.M{"id": row[0]}).
 				SetUpdate(bson.M{"$set": bson.M{
-					"id":         row[0],
-					"bin":        row[1],
-					"heightroof": row[2],
+					"id":           row[0],
+					"borough_code": row[1],
+					"heightroof":   row[2],
 				}}).
 				SetUpsert(true)
 
