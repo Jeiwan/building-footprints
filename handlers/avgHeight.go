@@ -12,8 +12,8 @@ type request struct {
 
 type response float64
 
-// AvgArea renders average area by borough code
-func AvgArea(c echo.Context) error {
+// AvgHeight renders average height by borough code
+func AvgHeight(c echo.Context) error {
 	var req request
 	if err := c.Bind(&req); err != nil {
 		return c.JSON(http.StatusBadRequest, map[string]string{"error": err.Error()})

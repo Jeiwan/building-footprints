@@ -50,7 +50,7 @@ func main() {
 		e.Validator = &customValidator{validator: validator.New()}
 
 		api := e.Group("/api/v0")
-		api.GET("/avg_area", handlers.AvgArea)
+		api.GET("/avg_height", handlers.AvgHeight)
 
 		return e.Start(fmt.Sprintf(":%d", c.Int("port")))
 	}
