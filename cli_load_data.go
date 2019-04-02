@@ -76,9 +76,21 @@ func cliLoadData(c *cli.Context) error {
 	}
 
 	for i, building := range data.Data {
+		id, err := strconv.Atoi(building[idColumnIdx].(string))
+		if err != nil {
+			logrus.Errorf("wrong id: %v", building[idColumnIdx])
+			continue
+		}
+
 		bin, ok := building[binColumnIdx].(string)
 		if !ok || len(bin) != 7 {
 			logrus.Errorf("wrong BIN value: %v", building[binColumnIdx])
+			continue
+		}
+
+		heightRoof, err := strconv.ParseFloat(building[heightColumnIdx].(string), 64)
+		if err != nil {
+			logrus.Errorf("wrong heightRoof: %v", building[heightColumnIdx])
 			continue
 		}
 
@@ -89,9 +101,9 @@ func cliLoadData(c *cli.Context) error {
 		}
 
 		trimmedData := []interface{}{
-			building[idColumnIdx],
+			id,
 			boroughCode,
-			building[heightColumnIdx],
+			heightRoof,
 		}
 		data.Data[i] = trimmedData
 	}
