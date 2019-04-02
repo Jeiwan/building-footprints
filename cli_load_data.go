@@ -42,6 +42,7 @@ func cliLoadData(c *cli.Context) error {
 	if err := json.NewDecoder(dataFile).Decode(&data); err != nil {
 		return err
 	}
+	logrus.Infof("loaded %d rows", len(data.Data))
 
 	binColumnIdx := -1
 	heightColumnIdx := -1
@@ -76,6 +77,7 @@ func cliLoadData(c *cli.Context) error {
 		return fmt.Errorf("DOITT_ID column not found")
 	}
 
+	logrus.Info("processing data")
 	for i, building := range data.Data {
 		id, err := strconv.Atoi(building[idColumnIdx].(string))
 		if err != nil {

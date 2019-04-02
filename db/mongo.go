@@ -110,15 +110,15 @@ func (m Mongo) SaveData(rows [][]interface{}) error {
 	var um *mongo.UpdateOneModel
 	var row []interface{}
 
+	nRows := len(rows)
 	batches := int(math.Ceil(float64(len(rows)) / float64(batchSize)))
 	coll := m.c.Database(m.db).Collection(footprintsColl)
 
-Loop:
 	for i := 0; i < batches; i++ {
 		for j := 0; j < batchSize; j++ {
 			rowIdx := (i * batchSize) + j
-			if rowIdx >= len(rows) {
-				break Loop
+			if rowIdx >= nRows {
+				break
 			}
 			row = rows[rowIdx]
 
